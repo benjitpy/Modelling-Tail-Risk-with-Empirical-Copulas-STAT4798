@@ -22,6 +22,7 @@
 \usepackage{dsfont}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{caption}
 \linespread{1.5}
 
 
@@ -73,7 +74,7 @@
             
        Department of Statistics and Actuarial Science\\
        The University of Hong Kong\\
-       29 April 2024
+       30 April 2024
             
    \end{center}
 
@@ -82,16 +83,23 @@
 \newpage
 \begin{flushleft}
 \LARGE
-\textbf{Abstract} \\
+\textbf{Preface} \\
 \normalsize
 \vspace{1cm}
-Abstract goes here
+Prof. Hofert has provided inspiration and motivation behind this project (understanding the overestimation and underestimation of tail risk). I have developed the algorithm in its entirety, and is reviewed by Prof. Hofert, where he has given comments on how to improve the simulation. The report is also typed entirely by me, where the first half of the report are prerequisites, which are in reference with various relevant literatures (most notably \cite{HofertBook}, \cite{KojadinovicYi2024Smooth}, \cite{SegersEBC}); and the second half of the report is original, with parts of the R code referencing \cite{copulaRPackage2023}, \cite{KojadinovicYi2024Smooth} with some modifications from me. 
 \end{flushleft}
 
+\newpage
+\begin{flushleft}
+\LARGE
+\textbf{Acknowledgements} \\
+\normalsize
+\vspace{1cm}
+I would like to thank Prof. Hofert, my supervisor for STAT4798, for his continued guidance in the entirety of this project, where he has introduced the underlying motivation around this topic and on copulas overall. I would also like to especially thank my friend Yao Hui for assisting in running the (super long) R algorithm for me (as my computer did not have sufficient memory / RAM to handle the simulation). I would also like to thank my friends for their continued support during this course, and lastly my girlfriend Tiffannie, or I wouldn't have stood till now.
+\end{flushleft}
 
 \tableofcontents
 \renewcommand\thesection{\arabic{section}}
-
 
 \newpage
 \begin{flushleft}
@@ -124,7 +132,7 @@ To overcome this shortcoming, multiple smoothed copulas built on the basis of em
 \vspace{0.5cm}
 In present time, tail risk is widely less understood and often underestimated. It is known that the usage of the no-tail-dependent Gaussian Copula in the modelling of default probability of securities (and tranches) with mortgage underlyings have indirectly led to the financial crisis in 2007, where securities are mispriced due to the underestimation of tail default risk. The usage of the wordings "1-in-500" in describing the massive flood that happened in Hong Kong during late 2023 is widely misunderstood, as there are no 500-year worth of data in understanding an event of this scale. Yet, due to global warming, these large scale national disasters will be recurring (or even commonplace) in the near future, which brings the urgency in developing tail risk modelling techniques. \\
 \vspace{0.5cm}
-In this report, we try to understand whether the class of empirical copulas systematically underestimate or overestimate tail risk with respect to the true underlying copula by running a monte-carlo simulation to compute the up-tail and low-tail probability of the class of empirical copulas and compare it to the true up-tail and low-tail probability. This could extend the possibility that empirical copulas can be more widely applied in the modelling of tail risks without the risk of misspecifying the class of copulas. \\
+In this report, we try to understand whether the class of empirical copulas systematically underestimate or overestimate tail risk with respect to the true underlying copula by computing the up-tail and low-tail probability of the class of empirical copulas and compare it to the true up-tail and low-tail probability. This could extend the possibility that even for a small sample size empirical copula can be more widely applied in the modelling of tail risks without the risk of misspecifying the class of copulas and with added accuracy compared to other parametric / semiparametric methods. \\
 \vspace{0.5cm}
 
 \newpage
@@ -811,7 +819,7 @@ Hence, let $\textbf{m} = (n, \dots, n) = \textbf{n}$. Hence, the empirical beta 
 B_{\textbf{n}}(C_{n})(\textbf{u}) = \int_{[0,1]^d} C_{n}(\textbf{w})  \: d\mu_{\textbf{n},\textbf{u}}(w)  
 \end{align*}
 
-\subsubsection{Creating the survival empirical beta copula}
+\subsubsection{Creating the survival function of empirical beta copula}
 
 Recall that the empirical beta copula can be rewritten as:
 \begin{align*}
@@ -819,8 +827,8 @@ C^{\beta}_{n}(\textbf{u}) = \frac{1}{n} \sum\limits_{i = 1}^{n} \prod\limits_{j 
 \end{align*}
 We propose a (proxy) survival function for the corresponding empirical beta copula.
 \begin{definition}\label{SurvivalEBC}
-\textbf{Survival empirical beta copula} \\
-The survival empirical beta copula is defined as:
+\textbf{Survival function of the empirical beta copula} \\
+The survival function of the empirical beta copula is defined as:
 \begin{align*}
 C^{\beta}_{n}(\textbf{u}) = \frac{1}{n} \sum\limits_{i = 1}^{n} \prod\limits_{j = 1}^{d} P(V_{R_{i,j},j} \ge u_{j}) = \frac{1}{n} \sum\limits_{i = 1}^{n} \prod\limits_{j = 1}^{d} (1 - F_{n,R_{i,j}}(u_{j})), \: \textbf{u} \: \in \: [0,1]^{d}
 \end{align*}
@@ -938,7 +946,7 @@ The proposed continuous distribution is shown below:
 \item Marginal distributions beta distributed
 \begin{align*}
 E[W^{\textbf{X}}_{u_{j}}] = u_{j} &= \frac{\alpha}{\alpha + \beta} \\
-Var(W^{\textbf{X}}_{u_{j}}) &= \rho \: \frac{u_{j} (1 - u{j})}{n}\\
+Var(W^{\textbf{X}}_{u_{j}}) &= \rho \: \frac{u_{j} (1 - u_{j})}{n}\\
 \rho &= \frac{n u_{j}}{\alpha + u_{j}}
 \end{align*}
 \end{enumerate}
@@ -1041,17 +1049,17 @@ C_{n}^{\boxplus}(\textbf{u}) = \frac{1}{n} \sum\limits_{i = 1}^{n} \prod\limits_
 \item \textbf{Empirical copula with binomial smoothed survival margins ($\rho$ = 4) and empirical beta copula as survival copula}
 \begin{align*}
 C_{n}^{v}(\textbf{u}) &= \frac{1}{n} \sum\limits_{i = 1}^{n} \Tilde{C}_{\textbf{u}}^{\textbf{X}} \left[\Bar{F}_{u_{1}}^{\textbf{X}}\left(\frac{R_{i,1} - 1}{n}\right), \dots, \Bar{F}_{u_{d}}^{\textbf{X}}\left(\frac{R_{i,d} - 1}{n}\right) \right] \\
-&= \frac{1}{n} \sum\limits_{i = 1}^{n} \Tilde{C}_{\textbf{u}}^{\textbf{X}} \left[\Bar{B}_{n, u_{1}}^{\textbf{X}}\left(R_{i,1} - 1\right), \dots, \Bar{B}_{n, u_{d}}^{\textbf{X}}\left(R_{i,d} - 1\right) \right]
+&= \frac{1}{n} \sum\limits_{i = 1}^{n} C_{n}^{\beta} \left[\Bar{B}_{n, u_{1}}^{\textbf{X}}\left(R_{i,1} - 1\right), \dots, \Bar{B}_{n, u_{d}}^{\textbf{X}}\left(R_{i,d} - 1\right) \right]
 \end{align*}
 where $\Bar{B}_{n, u_{d}}^{\textbf{X}}$ is the survival function of the binomial distribution: $\Bar{B}_{n, u_{d}}^{\textbf{X}} \sim \mathbb{B}(n, u_{d})$
 \item \textbf{Empirical copula with beta-binomial smoothed survival margins ($\rho$ = 4) and empirical beta copula as survival copula}
 \begin{align*}
-C_{n}^{v}(\textbf{u}) &= \frac{1}{n} \sum\limits_{i = 1}^{n} \Tilde{C}_{\textbf{u}}^{\textbf{X}} \left[\Bar{F}_{u_{1}}^{\textbf{X}}\left(\frac{R_{i,1} - 1}{n}\right), \dots, \Bar{F}_{u_{d}}^{\textbf{X}}\left(\frac{R_{i,d} - 1}{n}\right) \right]
+C_{n}^{v}(\textbf{u}) &= \frac{1}{n} \sum\limits_{i = 1}^{n} C_{n}^{\beta} \left[\Bar{BB}_{u_{1}}^{\textbf{X}}\left(R_{i,1} - 1\right), \dots, \Bar{BB}_{u_{d}}^{\textbf{X}}\left(R_{i,d} - 1\right) \right]
 \end{align*}
-where $\Bar{F}_{u_{j}}^{\textbf{X}}$ is beta-binomial distributed.
+where $\Bar{BB}_{u_{j}}^{\textbf{X}}$ is the survival function of the beta-binomial distribution.
 \item \textbf{Empirical copula with beta smoothed survival margins ($\rho$ = 4) and empirical beta copula as survival copula}
 \begin{align*}
-C_{n}^{v}(\textbf{u}) &= \frac{1}{n} \sum\limits_{i = 1}^{n} \Tilde{C}_{\textbf{u}}^{\textbf{X}} \left[\Bar{F}_{u_{1}}^{\textbf{X}}\left(\frac{R_{i,1} - 1}{n}\right), \dots, \Bar{F}_{u_{d}}^{\textbf{X}}\left(\frac{R_{i,d} - 1}{n}\right) \right]
+C_{n}^{v}(\textbf{u}) &= \frac{1}{n} \sum\limits_{i = 1}^{n} C_{n}^{\beta} \left[\Bar{F}_{u_{1}}^{\textbf{X}}\left(\frac{R_{i,1} - 0.5}{n}\right), \dots, \Bar{F}_{u_{d}}^{\textbf{X}}\left(\frac{R_{i,d} - 0.5}{n}\right) \right]
 \end{align*}
 where $\Bar{F}_{u_{j}}^{\textbf{X}}$ is beta distributed.
 \end{enumerate}
@@ -1148,10 +1156,11 @@ For $\psi(t)$ = $\exp(-t^{1/\theta})$:
 In the following algorithm, we benchmark the exceedance and cumulative probabilities to understand the extent of the underestimation / overestimation of tail risk of the class of empirical copulas. \\
 \vspace{0.5cm}
 Before illustrating the algorithm for exceedance and cumulative probabilities, we provide an algorithm on the fitting of the survival function of the class of empirical copulas.\\
-\begin{algorithm}
+\newpage
+\begin{algorithm}[H]
 \caption{Creating the survival function of empirical copula}
 \begin{algorithmic}
-\Procedure{SurvivalFunctionEC}{$\mathbf{u}$, $\mathbf{U}$, copula}
+\Procedure{SurvivalFunctionEC}{$\mathbf{u}$, $\mathbf{U}$}
     \State n $\gets$ row($\mathbf{U}$)
     \State d $\gets$ col($\mathbf{U}$)
     \For{i in 1:n}
@@ -1160,18 +1169,40 @@ Before illustrating the algorithm for exceedance and cumulative probabilities, w
         \EndFor
     \EndFor
     \State $\mathbf{\Hat{U}} \gets \frac{\mathbf{R}}{n + 1}$ \Comment{As $\textbf{U}$ is unknown, pseudo-observations $\mathbf{\Hat{U}}$ are created}
-    \For{i in 1:n}
-        \State $ \Bar{H}(\textbf{u}_{i,\cdot}) \gets \frac{1}{n} \sum\limits_{i = 1}^{n} \mathds{1}\{\mathbf{\Hat{U}}_{i,\cdot} \ge \mathbf{u}_{i,\cdot}\}$ \Comment{Analysed componentwise}
-    \EndFor
+    
+    \State $ \Bar{H}(\textbf{u}) \gets \frac{1}{n} \sum\limits_{i = 1}^{n} \mathds{1}\{\mathbf{\Hat{U}}_{i,\cdot} \ge \mathbf{u}_{i,\cdot}\}$ \Comment{Analysed componentwise}
+    
     \State \Return $\Bar{H}(\textbf{u})$
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Creating the survival function of empirical beta copula}
 \begin{algorithmic}
-\Procedure{SurvivalFunctionEC}{$\mathbf{u}$, $\mathbf{U}$, copula}
+\Procedure{SurvivalFunctionEBC}{$\mathbf{u}$, $\mathbf{U}$}
+    \State n $\gets$ row($\mathbf{U}$)
+    \State d $\gets$ col($\mathbf{U}$)
+    \For{i in 1:n}
+        \For{j in 1:d}
+            \State $\textbf{R}_{i,j} \gets \sum\limits_{k = 1}^{n} \mathds{1} \{ \textbf{U}_{i,j} \le \textbf{U}_{k,j} \}$
+        \EndFor
+    \EndFor
+    \State $C^{\beta}_{n}(\textbf{u}) \gets \frac{1}{n}\sum\limits_{i = 1}^{n} \prod\limits_{j = 1}^{d} P(\mathbb{B}(R_{i,j}, n + 1 - R_{i,j}) \ge u_{i,j})$
+    \State \Return $C^{\beta}_{n}(\textbf{u})$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Creating the survival function of empirical checkerboard copula}
+\begin{algorithmic}
+\Procedure{CumulativeFunctionECC}{$\mathbf{u}$, $\mathbf{\Hat{U}}$} \Comment{$\mathbf{\Hat{U}}$ instead of $\mathbf{U}$}
+    \State $\textbf{R} \gets \mathbf{\Hat{U}} \times (n + 1)$
+    \State $C^{\boxplus}_{n}(\textbf{u}) \gets \frac{1}{n}\sum\limits_{i = 1}^{n} \prod\limits_{j = 1}^{d} min\{max\{nu_{i.j} + 1 - R_{i,j}\}, 1\}$
+    \State \Return $C^{\boxplus}_{n}(\textbf{u})$
+\EndProcedure
+\Procedure{SurvivalFunctionECC}{$\mathbf{u}$, $\mathbf{U}$}
     \State n $\gets$ row($\mathbf{U}$)
     \State d $\gets$ col($\mathbf{U}$)
     \For{i in 1:n}
@@ -1180,17 +1211,127 @@ Before illustrating the algorithm for exceedance and cumulative probabilities, w
         \EndFor
     \EndFor
     \State $\mathbf{\Hat{U}} \gets \frac{\mathbf{R}}{n + 1}$ \Comment{As $\textbf{U}$ is unknown, pseudo-observations $\mathbf{\Hat{U}}$ are created}
-    \For{i in 1:n}
-        \State $ \Bar{H}(\textbf{u}_{i,\cdot}) \gets \frac{1}{n} \sum\limits_{i = 1}^{n} \mathds{1}\{\mathbf{\Hat{U}}_{i,\cdot} \ge \mathbf{u}_{i,\cdot}\}$ \Comment{Analysed componentwise}
+    \State $\mathbf{u^{*}} \gets 1 - reverse(\textbf{u})$ \Comment{reverse(\textbf{u}) means reversing the columns upside down}
+    \State $\Omega \gets PowerSet(1, \dots, d)$ 
+    \State $\Bar{H} \gets$ 0 
+    \For{each subset $\Omega^{*}$ of $\Omega$}
+        \If{length($\Omega^{*}$) = 0}
+            \State $\Bar{H} \gets \Bar{H} + 1$
+        \ElsIf{length($\Omega^{*}$) = 1}
+            \State $\Bar{H} \gets \Bar{H} - (1 - \mathbf{u^{*}}_{j \in \Omega^{*}})$ \Comment{deduct 1 - $u_{j}$ (1-dimensional) from $\Bar{H}$}
+        \Else
+            \State $\Bar{H} \gets \Bar{H} + (-1)^{length(\Omega^{*})}$ CumulativeFunctionECC$(1 - \mathbf{u^{*}}_{j \in \Omega^{*}}, \mathbf{\Hat{U}^{*}}_{j \in \Omega^{*}}) $
+        \EndIf
     \EndFor
-    \State \Return $\Bar{H}(\textbf{u})$
+    \State \Return $\Bar{H}$
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 
-The following algorithm corresponds to the R function: $emp \_survivalprob$, which will be shown in the appendix.
+\begin{algorithm}[H]
+\caption{Creating the survival function of empirical copula, empirical beta copula adapted, binomial survival margins}
+\begin{algorithmic}
+\Procedure{CumulativeFunctionEBinom}{$\mathbf{u}$, $\mathbf{\Hat{U}}$} \Comment{$\mathbf{\Hat{U}}$ instead of $\mathbf{U}$}
+    \State $\textbf{R} \gets \mathbf{\Hat{U}} \times (n + 1)$
+    \State $C^{v}_{n}(\textbf{u}) \gets \frac{1}{n}\sum\limits_{i = 1}^{n} C_{n}^{\beta} \left[P\left(Bin(n, u_{i,1}) \ge (R_{i,1} - 1)\right), \dots, P\left(Bin(n, u_{i,d}) \ge (R_{i,d} - 1)\right)\right]$
+    \State \Return $C^{v}_{n}(\textbf{u})$
+\EndProcedure
+\Procedure{SurvivalFunctionEBinom}{$\mathbf{u}$, $\mathbf{U}$}
+    \State n $\gets$ row($\mathbf{U}$)
+    \State d $\gets$ col($\mathbf{U}$)
+    \For{i in 1:n}
+        \For{j in 1:d}
+            \State $\textbf{R}_{i,j} \gets \sum\limits_{k = 1}^{n} \mathds{1} \{ \textbf{U}_{i,j} \le \textbf{U}_{k,j} \}$
+        \EndFor
+    \EndFor
+    \State $\mathbf{\Hat{U}} \gets \frac{\mathbf{R}}{n + 1}$ \Comment{As $\textbf{U}$ is unknown, pseudo-observations $\mathbf{\Hat{U}}$ are created}
+    \State $\mathbf{u^{*}} \gets 1 - reverse(\textbf{u})$ \Comment{reverse(\textbf{u}) means reversing the columns upside down}
+    \State $\Omega \gets PowerSet(1, \dots, d)$ 
+    \State $\Bar{H} \gets$ 0 
+    \For{each subset $\Omega^{*}$ of $\Omega$}
+        \If{length($\Omega^{*}$) = 0}
+            \State $\Bar{H} \gets \Bar{H} + 1$
+        \ElsIf{length($\Omega^{*}$) = 1}
+            \State $\Bar{H} \gets \Bar{H} - (1 - \mathbf{u^{*}}_{j \in \Omega^{*}})$ \Comment{deduct 1 - $u_{j}$ (1-dimensional) from $\Bar{H}$}
+        \Else
+            \State $\Bar{H} \gets \Bar{H} + (-1)^{length(\Omega^{*})}$ CumulativeFunctionEBinom$(1 - \mathbf{u^{*}}_{j \in \Omega^{*}}, \mathbf{\Hat{U}^{*}}_{j \in \Omega^{*}}) $
+        \EndIf
+    \EndFor
+    \State \Return $\Bar{H}$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
 
-\begin{algorithm}
+\begin{algorithm}[H]
+\caption{Creating the survival function of empirical copula, empirical beta copula adapted, beta-binomial survival margins with $\rho$ = 4}
+\begin{algorithmic}
+\Procedure{CumulativeFunctionEBB4}{$\mathbf{u}$, $\mathbf{\Hat{U}}$} \Comment{$\mathbf{\Hat{U}}$ instead of $\mathbf{U}$}
+    \State $\textbf{R} \gets \mathbf{\Hat{U}} \times (n + 1)$
+    \State $C^{v}_{n}(\textbf{u}) \gets \frac{1}{n}\sum\limits_{i = 1}^{n} C_{n}^{\beta} \left[P\left(BB(n, u_{i,1}, \rho = 4) \ge \frac{R_{i,1} - 1}{n}\right), \dots, P\left(BB(n, u_{i,d}, \rho = 4) \ge \frac{R_{i,d} - 1}{n}\right)\right]$
+    \State \Return $C^{v}_{n}(\textbf{u})$
+\EndProcedure
+\Procedure{SurvivalFunctionEBB4}{$\mathbf{u}$, $\mathbf{U}$}
+    \State n $\gets$ row($\mathbf{U}$)
+    \State d $\gets$ col($\mathbf{U}$)
+    \For{i in 1:n}
+        \For{j in 1:d}
+            \State $\textbf{R}_{i,j} \gets \sum\limits_{k = 1}^{n} \mathds{1} \{ \textbf{U}_{i,j} \le \textbf{U}_{k,j} \}$
+        \EndFor
+    \EndFor
+    \State $\mathbf{\Hat{U}} \gets \frac{\mathbf{R}}{n + 1}$ \Comment{As $\textbf{U}$ is unknown, pseudo-observations $\mathbf{\Hat{U}}$ are created}
+    \State $\mathbf{u^{*}} \gets 1 - reverse(\textbf{u})$ \Comment{reverse(\textbf{u}) means reversing the columns upside down}
+    \State $\Omega \gets PowerSet(1, \dots, d)$ 
+    \State $\Bar{H} \gets$ 0 
+    \For{each subset $\Omega^{*}$ of $\Omega$}
+        \If{length($\Omega^{*}$) = 0}
+            \State $\Bar{H} \gets \Bar{H} + 1$
+        \ElsIf{length($\Omega^{*}$) = 1}
+            \State $\Bar{H} \gets \Bar{H} - (1 - \mathbf{u^{*}}_{j \in \Omega^{*}})$ \Comment{deduct 1 - $u_{j}$ (1-dimensional) from $\Bar{H}$}
+        \Else
+            \State $\Bar{H} \gets \Bar{H} + (-1)^{length(\Omega^{*})}$ CumulativeFunctionEBB4$(1 - \mathbf{u^{*}}_{j \in \Omega^{*}}, \mathbf{\Hat{U}^{*}}_{j \in \Omega^{*}}) $
+        \EndIf
+    \EndFor
+    \State \Return $\Bar{H}$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Creating the survival function of empirical copula, empirical beta copula adapted, beta survival margins with $\rho$ = 4}
+\begin{algorithmic}
+\Procedure{CumulativeFunctionEBeta4}{$\mathbf{u}$, $\mathbf{\Hat{U}}$} \Comment{$\mathbf{\Hat{U}}$ instead of $\mathbf{U}$}
+    \State $\textbf{R} \gets \mathbf{\Hat{U}} \times (n + 1)$
+    \State $C^{v}_{n}(\textbf{u}) \gets \frac{1}{n}\sum\limits_{i = 1}^{n} C_{n}^{\beta} \left[P\left(\mathbb{B}(n, u_{i,1}, \rho = 4) \ge \frac{R_{i,1} - 0.5}{n}\right), \dots, P\left(\mathbb{B}(n, u_{i,d}, \rho = 4) \ge \frac{R_{i,d} - 0.5}{n}\right)\right]$
+    \State \Return $C^{v}_{n}(\textbf{u})$
+\EndProcedure
+\Procedure{SurvivalFunctionEBeta4}{$\mathbf{u}$, $\mathbf{U}$}
+    \State n $\gets$ row($\mathbf{U}$)
+    \State d $\gets$ col($\mathbf{U}$)
+    \For{i in 1:n}
+        \For{j in 1:d}
+            \State $\textbf{R}_{i,j} \gets \sum\limits_{k = 1}^{n} \mathds{1} \{ \textbf{U}_{i,j} \le \textbf{U}_{k,j} \}$
+        \EndFor
+    \EndFor
+    \State $\mathbf{\Hat{U}} \gets \frac{\mathbf{R}}{n + 1}$ \Comment{As $\textbf{U}$ is unknown, pseudo-observations $\mathbf{\Hat{U}}$ are created}
+    \State $\mathbf{u^{*}} \gets 1 - reverse(\textbf{u})$ \Comment{reverse(\textbf{u}) means reversing the columns upside down}
+    \State $\Omega \gets PowerSet(1, \dots, d)$ 
+    \State $\Bar{H} \gets$ 0 
+    \For{each subset $\Omega^{*}$ of $\Omega$}
+        \If{length($\Omega^{*}$) = 0}
+            \State $\Bar{H} \gets \Bar{H} + 1$
+        \ElsIf{length($\Omega^{*}$) = 1}
+            \State $\Bar{H} \gets \Bar{H} - (1 - \mathbf{u^{*}}_{j \in \Omega^{*}})$ \Comment{deduct 1 - $u_{j}$ (1-dimensional) from $\Bar{H}$}
+        \Else
+            \State $\Bar{H} \gets \Bar{H} + (-1)^{length(\Omega^{*})}$ CumulativeFunctionEBB4$(1 - \mathbf{u^{*}}_{j \in \Omega^{*}}, \mathbf{\Hat{U}^{*}}_{j \in \Omega^{*}}) $
+        \EndIf
+    \EndFor
+    \State \Return $\Bar{H}$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+The algorithm for exceedance and cumulative probabilities for empirical copulas are shown below: \\
+\begin{algorithm}[H]
 \caption{Exceedance probabilities of empirical copulas}
 \begin{algorithmic}
 \Procedure{SurvivalProbability}{copula} \Comment{copula is exogenously inputted.}
@@ -1198,39 +1339,339 @@ The following algorithm corresponds to the R function: $emp \_survivalprob$, whi
     \State B $\gets 30$
     \State d $\gets$ dim(copula)
     \State $\mathbf{u\_mat} \gets \mathbf{u} = (\mathbf{u_{1}}, \mathbf{u_{2}}, \dots, \mathbf{u_{d}})$ \Comment{$\mathbf{u_{i}}$: identical evaluation point vector $(0.95, \dots, 1)$}
-    \State true\_res\_mat $\gets \Bar{C}(1 - \textbf{u})$ \Comment{obtain exceedance probability for true copula}
+    \State true\_res\_mat\_s $\gets \Bar{C}(1 - \textbf{u})$ \Comment{obtain exceedance probability for true copula}
     \For{b in 1:B}
         \State $\textbf{U}^{n,d} \gets$ resampling from copula \Comment{See Algorithm \ref{GaussianCopulaResampling}, \ref{tCopulaResampling}, \ref{MarshallOlkinAlgoClayton}, \ref{MarshallOlkinAlgoGumbel}}
-        \State ec\_res\_mat(b) $\gets$ SurvivalFunctionEC($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$, copula)
-        \State ebc\_res\_mat(b) $\gets$ SurvivalFunctionEBC($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$, copula)
-        \State ecc\_res\_mat(b) $\gets$ SurvivalFunctionECC($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$, copula)
-        \State ebb4\_res\_mat(b) $\gets$ SurvivalFunctionEBB4($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$, copula)
-        \State ebeta4\_res\_mat(b) $\gets$ SurvivalFunctionEBeta4($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$, copula)
-        \State ebinom4\_res\_mat(b) $\gets$ SurvivalFunctionEBinom4($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$, copula)
+        \State ec\_res\_mat\_s(b) $\gets$ SurvivalFunctionEC($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$)
+        \State ebc\_res\_mat\_s(b) $\gets$ SurvivalFunctionEBC($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$)
+        \State ecc\_res\_mat\_s(b) $\gets$ SurvivalFunctionECC($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$)
+        \State ebinom\_res\_mat\_s(b) $\gets$ SurvivalFunctionEBinom($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$)
+        \State ebb4\_res\_mat\_s(b) $\gets$ SurvivalFunctionEBB4($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$)
+        \State ebeta4\_res\_mat\_s(b) $\gets$ SurvivalFunctionEBeta4($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$)
+
     \EndFor
-    \State mean\_ec\_res\_mat $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ec\_res\_mat(i)
-    \State mean\_ebc\_res\_mat $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ebc\_res\_mat(i)
-    \State mean\_ecc\_res\_mat $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ecc\_res\_mat(i)
-    \State mean\_ebb4\_res\_mat $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ebb4\_res\_mat(i)
-    \State mean\_ebeta4\_res\_mat $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ebeta4\_res\_mat(i)
-    \State mean\_ebinom4\_res\_mat $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ebinom4\_res\_mat(i)
-    \State CI\_ec\_res\_mat $\gets$ 2.5\% and 97.5\% quantile of ec\_res\_mat
-    \State CI\_ebc\_res\_mat $\gets$ 2.5\% and 97.5\% quantile of ebc\_res\_mat
-    \State CI\_ecc\_res\_mat $\gets$ 2.5\% and 97.5\% quantile of ecc\_res\_mat
-    \State CI\_ebb4\_res\_mat $\gets$ 2.5\% and 97.5\% quantile of ebb4\_res\_mat
-    \State CI\_ebeta4\_res\_mat $\gets$ 2.5\% and 97.5\% quantile of ebeta4\_res\_mat
-    \State CI\_ebinom4\_res\_mat $\gets$ 2.5\% and 97.5\% quantile of ebinom4\_res\_mat
-    
-    \State \Return true\_res\_mat, mean\_ec\_res\_mat, mean\_ebc\_res\_mat, mean\_ecc\_res\_mat, mean\_ebb4\_res\_mat, mean\_ebeta4\_res\_mat, mean\_ebinom4\_res\_mat, CI\_ec\_res\_mat, CI\_ebc\_res\_mat, CI\_ecc\_res\_mat, CI\_ebb4\_res\_mat, CI\_ebeta4\_res\_mat, CI\_ebinom4\_res\_mat
+    \State mean\_ec\_res\_mat\_s $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ec\_res\_mat\_s(i)
+    \State mean\_ebc\_res\_mat\_s $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ebc\_res\_mat\_s(i)
+    \State mean\_ecc\_res\_mat\_s $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ecc\_res\_mat\_s(i)
+    \State mean\_ebinom\_res\_mat\_s $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ebinom\_res\_mat\_s(i)
+    \State mean\_ebb4\_res\_mat\_s $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ebb4\_res\_mat\_s(i)
+    \State mean\_ebeta4\_res\_mat\_s $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ebeta4\_res\_mat\_s(i)
+
+    \State CI\_ec\_res\_mat\_s $\gets$ 2.5\% and 97.5\% quantile of ec\_res\_mat\_s
+    \State CI\_ebc\_res\_mat\_s $\gets$ 2.5\% and 97.5\% quantile of ebc\_res\_mat\_s
+    \State CI\_ecc\_res\_mat\_s $\gets$ 2.5\% and 97.5\% quantile of ecc\_res\_mat\_s
+    \State CI\_ebinom\_res\_mat\_s $\gets$ 2.5\% and 97.5\% quantile of ebinom\_res\_mat\_s
+    \State CI\_ebb4\_res\_mat\_s $\gets$ 2.5\% and 97.5\% quantile of ebb4\_res\_mat\_s
+    \State CI\_ebeta4\_res\_mat\_s $\gets$ 2.5\% and 97.5\% quantile of ebeta4\_res\_mat\_s
+    \State \Return true\_res\_mat\_s, mean\_ec\_res\_mat\_s, mean\_ebc\_res\_mat\_s, mean\_ecc\_res\_mat\_s, mean\_ebb4\_res\_mat\_s, mean\_ebeta4\_res\_mat\_s, mean\_ebinom\_res\_mat\_s, CI\_ec\_res\_mat\_s, CI\_ebc\_res\_mat\_s, CI\_ecc\_res\_mat\_s, CI\_ebb4\_res\_mat\_s, CI\_ebeta4\_res\_mat\_s, CI\_ebinom\_res\_mat\_s
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
 
+\begin{algorithm}[H]
+\caption{Cumulative probabilities of empirical copulas}
+\begin{algorithmic}
+\Procedure{CumulativeProbability}{copula} \Comment{copula is exogenously inputted.}
+    \State n $\gets 125$
+    \State B $\gets 30$
+    \State d $\gets$ dim(copula)
+    \State $\mathbf{u\_mat} \gets \mathbf{u} = (\mathbf{u_{1}}, \mathbf{u_{2}}, \dots, \mathbf{u_{d}})$ \Comment{$\mathbf{u_{i}}$: identical evaluation point vector $(0.95, \dots, 1)$}
+    \State true\_res\_mat\_c $\gets C(\textbf{u})$ \Comment{obtain cumulative probability for true copula}
+    \For{b in 1:B}
+        \State $\textbf{U}^{n,d} \gets$ resampling from copula \Comment{See Algorithm \ref{GaussianCopulaResampling}, \ref{tCopulaResampling}, \ref{MarshallOlkinAlgoClayton}, \ref{MarshallOlkinAlgoGumbel}}
+        \State ec\_res\_mat\_c(b) $\gets \frac{1}{n} \sum\limits_{i = 1}^{j} \mathds{1}\{\Hat{\mathbf{U}}_{i,\cdot} \le \mathbf{u_{i,\cdot}}\}$ \Comment{$\Hat{\mathbf{U}}$ and $\mathbf{R}$ defined previously}
+        \State ebc\_res\_mat\_c(b) $\gets \frac{1}{n}\sum\limits_{i = 1}^{n} \prod\limits_{j = 1}^{d} P(\mathbb{B}(R_{i,j}, n + 1 - R_{i,j}) \le u_{i,j})$)
+        \State ecc\_res\_mat\_c(b) $\gets$ CumulativeFunctionECC($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$)
+        \State ebinom\_res\_mat\_c(b) $\gets$ CumulativeFunctionEBinom($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$)
+        \State ebb4\_res\_mat\_c(b) $\gets$ CumulativeFunctionEBB4($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$)
+        \State ebeta4\_res\_mat\_c(b) $\gets$ CumulativeFunctionEBeta4($\mathbf{u\_mat}$, $\textbf{U}^{n,d}$)
+
+    \EndFor
+    \State mean\_ec\_res\_mat\_c $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ec\_res\_mat\_c(i)
+    \State mean\_ebc\_res\_mat\_c $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ebc\_res\_mat\_c(i)
+    \State mean\_ecc\_res\_mat\_c $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ecc\_res\_mat\_c(i)
+    \State mean\_ebinom\_res\_mat\_c $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ebinom\_res\_mat\_c(i)
+    \State mean\_ebb4\_res\_mat\_c $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ebb4\_res\_mat\_c(i)
+    \State mean\_ebeta4\_res\_mat\_c $\gets$ $\frac{1}{b}\sum\limits_{i = 1}^{b}$ ebeta4\_res\_mat\_c(i)
+
+    \State CI\_ec\_res\_mat\_c $\gets$ 2.5\% and 97.5\% quantile of ec\_res\_mat\_c
+    \State CI\_ebc\_res\_mat\_c $\gets$ 2.5\% and 97.5\% quantile of ebc\_res\_mat\_c
+    \State CI\_ecc\_res\_mat\_c $\gets$ 2.5\% and 97.5\% quantile of ecc\_res\_mat\_c
+    \State CI\_ebinom\_res\_mat\_c $\gets$ 2.5\% and 97.5\% quantile of ebinom\_res\_mat\_c
+    \State CI\_ebb4\_res\_mat\_c $\gets$ 2.5\% and 97.5\% quantile of ebb4\_res\_mat\_c
+    \State CI\_ebeta4\_res\_mat\_c $\gets$ 2.5\% and 97.5\% quantile of ebeta4\_res\_mat\_c
+    \State \Return true\_res\_mat\_c, mean\_ec\_res\_mat\_c, mean\_ebc\_res\_mat\_c, mean\_ecc\_res\_mat\_c, mean\_ebb4\_res\_mat\_c, mean\_ebeta4\_res\_mat\_c, mean\_ebinom\_res\_mat\_c, CI\_ec\_res\_mat\_c, CI\_ebc\_res\_mat\_c, CI\_ecc\_res\_mat\_c, CI\_ebb4\_res\_mat\_c, CI\_ebeta4\_res\_mat\_c, CI\_ebinom\_res\_mat\_c
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Model Evaluation: Cramer-von-Mises (CvM) Statistic}
+\vspace{0.5cm}
+To understand how close the nonparametric estimation of the class of empirical copulas are, with respect to the true copula, the goodness-of-fit metric: Cramer-von-Mises statistic $S_{n}^{CvM}$ is used as it has higher performance on empirical processes compared to alternative goodness-of-fit tests such as the Kolmogorov-Smirnov statistics \parencite{GenestRemillardBeaudoinGOF2009}.\\
+\vspace{0.5cm}
+The Cramer-von-Mises statistic is defined as below:
+
+\begin{definition}\label{CvMStatistics}
+\textit{\normalfont(\cite{HofertBook}, \cite{GenestRemillardBeaudoinGOF2009})}\:
+\textbf{Cramer-von-Mises statistic} \\
+The Cramer-von-Mises statistic have the following form:
+\begin{align*}
+S_{n}^{CvM} = \int\limits_{[0,1]^d} n(C_{n}(\textbf{u}) - C(\textbf{u}))^{2} dC_{n}(\textbf{u})
+\end{align*}
+\end{definition}
+
+It can also be rewritten in a discretized way, and this form is extensively used in this report.
+
+\begin{definition}\label{CvMStatisticsDiscretized}
+\textit{\normalfont(\cite{HofertBook}, \cite{GenestRemillardBeaudoinGOF2009})}\:
+\textbf{Discretized Cramer-von-Mises statistic} \\
+The Discretized Cramer-von-Mises statistic have the following form:
+\begin{align*}
+S_{n}^{CvM} = \sum\limits_{i = 1}^{n} (C_{n}(\textbf{u}) - C(\textbf{u}))
+\end{align*}
+\end{definition}
+Hence the algorithm for computing the Cramer-von-Mises Statistic is proposed below:
+\begin{algorithm}[H]
+\caption{Discretized Cramer-von-Mises Statistic}
+\begin{algorithmic}
+\Procedure{CvM}{true\_res\_mat, mean\_ec\_res\_mat, n}
+    \State CvM $\gets \sum\limits_{i = 1}^{n}$ (mean\_ec\_res\_mat$_{i}$ - true\_res\_mat$_{i})^{2}$
+    \State \Return CvM
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\newpage
+\section{Results}
+\vspace{0.5cm}
+\subsection{Preparation}
+\vspace{0.5cm}
+Before plotting, a colour code table is given with reference to the large number of lines of each graph, to prevent convolution.\\
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=10cm]{ColorPalette/ColorPalette.png}
+\caption{Colour code mapping}
+\end{figure}%
+
+Notice that some combinations of copula, kendall's tau and dimensions are not plotted. For instance:\\
+\vspace{0.5cm}
+Recall that the domain of the parameter of Clayton and Gumbel-Hougaard copula is $(0,\infty)$ and $[1,\infty)$ respectively. Consider the kendall's tau for Gumbel-Hougaard and Clayton copulas:
+\begin{align*}
+    \tau_{C} = \frac{\theta}{\theta + 2}, \: \theta \in (0,\infty) \: \Longrightarrow \: \tau_{C} \in (0,\infty) \\
+    \tau_{G} = \frac{\theta - 1}{\theta}, \: \theta \in [1,\infty) \: \Longrightarrow \: \tau_{G} \in [0,\infty) 
+\end{align*}
+Hence, we will only consider $\tau_{C} \in {0.25, 0.5, 0.75}$ for Clayton copulas and $\tau_{G} \in {0, 0.25, 0.5, 0.75}$.\\
+\vspace{0.5cm}
+Moreover, the rotated copula for normal and student-t copulas faces Monte Carlo errors for $d \ge 3$ \parencite{HofertBook}, hence we will only consider normal and student-t copulas at $d = 2$.
+\newpage
+\subsection{Plots: $\textbf{u}$ (evaluation points) vs exceedance probabilities}
+\vspace{0.5cm}
+We first plot the (upper-tailed) evaluation points against the exceedance probabilities for each empirical copula. The evaluation points are on the x-axis and the exceedance probabilities are on the y-axis.
+
+\begin{center}
+\label{t4_2d_s}
+\includegraphics[width=17cm]{ExceedanceProb/t4_2d_s.png}
+\captionof{figure}{Student-t copula with d = 2}
+\end{center}%
+
+\begin{center}
+\label{N_2d_s}
+\includegraphics[width=17cm]{ExceedanceProb/N_2d_s.png}
+\captionof{figure}{Gaussian copula with d = 2}
+\end{center}%
+
+\begin{center}
+\label{G_2d_s}
+\includegraphics[width=17cm]{ExceedanceProb/G_2d_s.png}
+\captionof{figure}{Gumbel-Hougaard copula with d = 2}
+\end{center}%
+
+\begin{center}
+\label{G_3d_s}
+\includegraphics[width=17cm]{ExceedanceProb/G_3d_s.png}
+\captionof{figure}{Gumbel-Hougaard copula with d = 3}
+\end{center}%
+
+\begin{center}
+\label{G_4d_s}
+\includegraphics[width=17cm]{ExceedanceProb/G_4d_s.png}
+\captionof{figure}{Gumbel-Hougaard copula with d = 4}
+\end{center}%
+
+\begin{center}
+\label{G_5d_s}
+\includegraphics[width=17cm]{ExceedanceProb/G_5d_s.png}
+\captionof{figure}{Gumbel-Hougaard copula with d = 5}
+\end{center}%
+
+\newpage
+\subsection{CvM: Exceedance probabilities}
+To better understand the proximity of the exceedance probabilities from the class of empirical copula, with respect to the true copula, we then compute the Cramer-von-Mises statistics for all combinations of empirical copulas, Kendall's Tau and dimensions.
+
+\begin{center}
+\label{t4_2d_s_CvM}
+\includegraphics[width=17cm]{ExceedanceCvM/t4_2d_s_CvM.png}
+\captionof{figure}{Student-t copula with d = 2}
+\end{center}%
+
+\begin{center}
+\label{N_2d_s_CvM}
+\includegraphics[width=17cm]{ExceedanceCvM/N_2d_s_CvM.png}
+\captionof{figure}{Gaussian copula with d = 2}
+\end{center}%
+
+\begin{center}
+\label{G_2d_s_CvM}
+\includegraphics[width=17cm]{ExceedanceCvM/G_2d_s_CvM.png}
+\captionof{figure}{Gumbel-Hougaard copula with d = 2}
+\end{center}%
+
+\begin{center}
+\label{G_3d_s_CvM}
+\includegraphics[width=17cm]{ExceedanceCvM/G_3d_s_CvM.png}
+\captionof{figure}{Gumbel-Hougaard copula with d = 3}
+\end{center}%
+
+\begin{center}
+\label{G_4d_s_CvM}
+\includegraphics[width=17cm]{ExceedanceCvM/G_4d_s_CvM.png}
+\captionof{figure}{Gumbel-Hougaard copula with d = 4}
+\end{center}%
+
+\begin{center}
+\label{G_5d_s_CvM}
+\includegraphics[width=17cm]{ExceedanceCvM/G_5d_s_CvM.png}
+\captionof{figure}{Gumbel-Hougaard copula with d = 5}
+\end{center}%
+
+\newpage
+\subsection{Analysis: Exceedance probabilities}
+\vspace{0.5cm}
+There are a few conclusions that can be reached by analysed the aforementioned plots. \\
+
+\subsubsection{Lower Kendall's tau values}
+\vspace{0.5cm}
+It can be observed that there are an overall worse predictive performance at the lower Kendall's Tau (notably negative Kendall's Tau). From intuition, a low Kendall's Tau represents that, for a bivariate case, the independent margins are negatively related (points are concentrated on the top-left or bottom-right corner). Similar intuition holds for high-dimensional cases. Hence, there are little-to-no weight on the lower-tail or upper-tail (i.e. in the bivariate case, bottom-left and top-right corner). In the current analysis, the size of the dataset is relatively small (i.e. $n = 125$). Hence, even when resampling 125 samples from the target true copula, it is unlikely that the sample created will have any weight at the upper tail. Hence, for a smaller tau, most copulas (except beta-survival margins smoothed empirical copula) vastly underestimates the upper tail. It is noted that some graphs show a systematic overestimation with respect to the true copula, which is intuitive; as the probability of having samples at the extreme tail (for low Kendall's Tau values) are low, sampling differences might bring the estimated copula to underestimate or overestimate the true copula.\\
+\vspace{0.5cm}
+It is notable that the smoothed EBC-adapted empirical copula with beta-binomial survival margins seems to best estimate the true-copula at lower values of Kendall's tau, compared to the other two types of smoothed empirical copula. \\
+\vspace{0.5cm}
+To more accurately estimate the true-copula by using the class of empirical copulas, a larger $n$ is needed, as the class of empirical copula asymptotically converges to the true copula for large $n$. However, this becomes prohibitive when available data is not sufficient. 
+
+\pagebreak
+\subsubsection{Erratic behaviour from smoothed EBC-adapted empirical copula with beta survival margins}
+
+It can be seen from the plots that the smoothed EBC-adapted empirical copula with beta survival margins have extremely volatile behaviour at the tail. It is noted that it is uncertain why the "survival function" exhibits a non-monotone pattern, as it is likely to be caused by rounding errors at the edge, as the order of the exceedance probabilities are from negative 5 to 10. \\
+\vspace{0.5cm}
+However, it is still interesting to understand the reason why, unlike the other types of empirical copulas, there appears to be a hump near $u = 0.99$.\\
+\vspace{0.5cm}
+Recall that the smoothed EBC-adapted empirical copula with beta survival margins is defined as follows:
+\begin{align*}
+C_{n}^{v}(\textbf{u}) &= \frac{1}{n} \sum\limits_{i = 1}^{n} C_{n}^{\beta} \left[\Bar{F}_{u_{1}}^{\textbf{X}}\left(\frac{R_{i,1} - 0.5}{n}\right), \dots, \Bar{F}_{u_{d}}^{\textbf{X}}\left(\frac{R_{i,d} - 0.5}{n}\right) \right]
+\end{align*}
+where $\Bar{F}_{u_{j}}^{\textbf{X}}$ is beta distributed. The survival function corresponding to this type of smoothed empirical copula is computed as follows:
+\begin{align*}
+\Bar{H}^{v}_{n}(\textbf{u}) = \Bar{C}^{v}_{n}(\textbf{1 -- u}) = \sum\limits_{J \subseteq \{1, \dots, d \} }(-1)^{|J|} C^{v}_{n} \left( u_{1}^{\mathds{1}(1\in J)}, \dots, u_{d}^{\mathds{1}(d\in J)} \right), \: \: \textbf{u} \in [0,1]^{d}
+\end{align*}
+Hence we can see the main determinant of the size of the survival function is entirely dependent on the smoothed EBC-adapted empirical copula with dimensions $d \in \{1, \dots, d\}$. Note that the beta distribution defined above is distributed as follows (proof is by algebraic manipulation, and can be found in \cite{KojadinovicYi2024Smooth}):
+\begin{align*}
+\alpha &= \frac{n - \rho}{\rho} \times u_{j}, \: j \in \{1, \dots, d\} \\
+\beta &= \frac{n - \rho}{\rho} \times (1 - u_{j}), \: j \in \{1, \dots, d\}
+\end{align*}
+In this simulation, $n = 125$ and $\rho = 4$, and $u_{j} \in \{0.95, \dots, 1\}$. The resulting $\alpha$ can be calculated as: $\alpha \in [28.7375, 30.25]$, and the resulting $\beta$ can be calculated as: $\beta \in [0, 1.5125]$. Hence, this is equivalent (componentwise), in evaluating the probability of a beta distribution with $\alpha \in [28.7375, 30.25]$ and $\beta \in [0, 1.5125]$ larger than $\frac{R_{i,j} - 0.5}{n} \in (0,1)$. As the resulting $\alpha$ is extremely large and resulting $\beta$ is extremely small, this results in a extremely heavy-right-tailed beta distribution. Substituting into the smoothed empirical EBC-adapted empirical copula, it will result in a very abnormally large copula $C^{v}_{n} \left( u_{1}^{\mathds{1}(1\in J)}, \dots, u_{d}^{\mathds{1}(d\in J)} \right)$, and hence a peak in the exceedance probability. As the appearance of a "up-tail" data point is rare during resampling procedures, this sudden peak in the exceedance probability (in one data row) will skew the average exceedance probability. In further analysis, it is ideal to increase the sample size to see if this observations is retained.\\
+\vspace{0.5cm}
+With the following revelation, the smoothed EBC-adapted empirical copula with beta survival margins are very suitable (under a larger sample size n) to model extremal events (such as joint default scenarios).
+
+\subsubsection{Systemic underestimation of the upper-tail at positive Kendall's tau}
+
+\newpage
+\subsection{Plots: $\textbf{u}$ (evaluation points) vs cumulative probabilities}
+\vspace{0.5cm}
+We then plot the (lower-tailed) evaluation points against the cumulative probabilities for each empirical copula. The evaluation points are on the x-axis and the cumulative probabilities are on the y-axis.
+
+\begin{center}
+\label{t4_2d_c}
+\includegraphics[width=17cm]{CumulativeProb/t4_2d_c.png}
+\captionof{figure}{Student-t copula with d = 2}
+\end{center}%
+
+\begin{center}
+\label{N_2d_c}
+\includegraphics[width=17cm]{CumulativeProb/N_2d_c.png}
+\captionof{figure}{Gaussian copula with d = 2}
+\end{center}%
+
+\begin{center}
+\label{C_2d_c}
+\includegraphics[width=17cm]{CumulativeProb/C_2d_c.png}
+\captionof{figure}{Clayton copula with d = 2}
+\end{center}%
+
+\begin{center}
+\label{C_3d_c}
+\includegraphics[width=17cm]{CumulativeProb/C_3d_c.png}
+\captionof{figure}{Clayton copula with d = 3}
+\end{center}%
+
+\begin{center}
+\label{C_4d_c}
+\includegraphics[width=17cm]{CumulativeProb/C_4d_c.png}
+\captionof{figure}{Clayton copula with d = 4}
+\end{center}%
+
+\begin{center}
+\label{C_5d_c}
+\includegraphics[width=17cm]{CumulativeProb/C_5d_c.png}
+\captionof{figure}{Clayton copula with d = 5}
+\end{center}%
 
 
+\newpage
+\subsection{CvM: Cumulative probabilities}
+To better understand the proximity of the cumulative probabilities for the class of empirical copula, with respect to the true copula, we then compute the Cramer-von-Mises statistics for all combinations of empirical copulas, Kendall's Tau and dimensions.
+
+\begin{center}
+\label{t4_2d_c_CvM}
+\includegraphics[width=17cm]{CumulativeCvM/t4_2d_c_CvM.png}
+\captionof{figure}{Student-t copula with d = 2}
+\end{center}%
+
+\begin{center}
+\label{N_2d_c_CvM}
+\includegraphics[width=17cm]{CumulativeCvM/N_2d_c_CvM.png}
+\captionof{figure}{Gaussian copula with d = 2}
+\end{center}%
+
+\begin{center}
+\label{C_2d_c_CvM}
+\includegraphics[width=17cm]{CumulativeCvM/C_2d_c_CvM.png}
+\captionof{figure}{Clayton copula with d = 2}
+\end{center}%
+
+\begin{center}
+\label{C_3d_c_CvM}
+\includegraphics[width=17cm]{CumulativeCvM/C_3d_c_CvM.png}
+\captionof{figure}{Clayton copula with d = 3}
+\end{center}%
+
+\begin{center}
+\label{C_4d_c_CvM}
+\includegraphics[width=17cm]{CumulativeCvM/C_4d_c_CvM.png}
+\captionof{figure}{Clayton copula with d = 4}
+\end{center}%
+
+\begin{center}
+\label{C_5d_c_CvM}
+\includegraphics[width=17cm]{CumulativeCvM/C_5d_c_CvM.png}
+\captionof{figure}{Clayton copula with d = 5}
+\end{center}%
+
+\newpage
+\subsection{Analysis: Cumulative probabilities}
 
 
-
+%3:3 -> 1000,1000$
+%2:2 -> 1200,600$
 \end{flushleft}
  
 \medskip
