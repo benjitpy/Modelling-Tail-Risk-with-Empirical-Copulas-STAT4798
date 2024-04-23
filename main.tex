@@ -83,6 +83,15 @@
 \newpage
 \begin{flushleft}
 \LARGE
+\textbf{Abstract} \\
+\normalsize
+\vspace{1cm}
+The empirical copula is a nonparametric method, without the need of pre-specifying the marginal distribution and the copula itself. Over the years, various statisticians have proposed new variations of the empirical copula, such as the empirical beta copula, empirical checkerboard copula, and most recently, the data-adaptive empirical copulas with pre-specified survival margins. Tail risk is often underestimated, due to the lack of available data / occurrence which lead to difficulties in fitting the upper and lower tail accurately. This report provides an oversight on how well the class of empirical copulas can fit to the upper and lower tail, by computing the exceedance and cumulative probabilities, and evaluating the probabilities with the corresponding true copula. It is found that the data-adaptive empirical copulas proposed by \cite{KojadinovicYi2024Smooth} exhibits the best performances despite some erratic patterns and systematic underestimation. The low-Kendall's-tau region is also extremely badly fit due to the limited sample size.
+\end{flushleft}
+
+\newpage
+\begin{flushleft}
+\LARGE
 \textbf{Preface} \\
 \normalsize
 \vspace{1cm}
@@ -1069,7 +1078,7 @@ where $\Bar{F}_{u_{j}}^{\textbf{X}}$ is beta distributed.
 In this report, we mainly focus on smaller dimensions, which include $d \in \{ 2, 3, 4, 5 \}$. This is due to the computationally prohibitive nature of computing the survival function of the target copula analytically. However, it can be expected that the characteristics of the tail risk can be generalised to higher dimensions.
 
 \subsubsection{Kendall's Tau}
-To increase comparability between copulas and also between dimensions, Kendall's tau matching is useful to backfit the underlying copula parameters. We can also observe whether, under different values of Kendall's tau, whether there is a systemic underestimate / overestimate of tail risk with respect to the true copula. For simplicity, 7 values of Kendall's tau are tested: $\tau \in \{ -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75 \}$. Kendall's tau matching is done via the iTau function from the "copula" R package \parencite{copulaRPackage2023}. \\
+To increase comparability between copulas and also between dimensions, Kendall's tau matching is useful to backfit the underlying copula parameters. We can also observe whether, under different values of Kendall's tau, whether there is a systematic underestimate / overestimate of tail risk with respect to the true copula. For simplicity, 7 values of Kendall's tau are tested: $\tau \in \{ -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75 \}$. Kendall's tau matching is done via the iTau function from the "copula" R package \parencite{copulaRPackage2023}. \\
 \vspace{0.5cm}
 Kendall's Tau matching is done instead of Spearman's Rho matching, as there are no analytical form of spearman's rho for archimedean copulas and can only be done by numerical estimation. However, it is not the case for Kendall's Tau.
 
@@ -1548,7 +1557,7 @@ To better understand the proximity of the exceedance probabilities from the clas
 \newpage
 \subsection{Analysis: Exceedance probabilities}
 \vspace{0.5cm}
-There are a few conclusions that can be reached by analysed the aforementioned plots. \\
+There are a few conclusions that can be reached by analysing the aforementioned plots. \\
 
 \subsubsection{Lower Kendall's tau values}
 \vspace{0.5cm}
@@ -1582,7 +1591,23 @@ In this simulation, $n = 125$ and $\rho = 4$, and $u_{j} \in \{0.95, \dots, 1\}$
 \vspace{0.5cm}
 With the following revelation, the smoothed EBC-adapted empirical copula with beta survival margins are very suitable (under a larger sample size n) to model extremal events (such as joint default scenarios).
 
-\subsubsection{Systemic underestimation of the upper-tail at positive Kendall's tau}
+\subsubsection{Systematic underestimation of the upper-tail at positive Kendall's tau}
+By closely observing the plots for higher Kendall's tau (especially those with positive tau), we can observe that, albeit the estimators very closely resembles the true copula, it is often (systematically) lower than the true copula.\\
+\vspace{0.5cm}
+The problem of underestimation is rampant when the Kendall's tau is close to 0. Due to the relatively small sample size ($n = 125$) and the discretized nature of the empirical copula, it places a 0 weight if all rows in $\textbf{U}$ is smaller than the evaluation vector $\textbf{u}$ (when computing the survival function of the empirical copula). In reality, the true copula still have weight at the upper tail (albeit negligible), hence leading to the underestimation of the copula. Similarly to the other types of empirical copulas, they are in a sense, just a continuum (EBC / EBB4 / EBinom / EBeta4) / interpolation (ECC) of the empirical copula. Hence, this underestimation property is unfortunately unavoidable, and could be overcame by increasing the sample size (as they are asymptotically convergent). As mentioned in the previous section, it is often unrealistic. 
+
+\subsubsection{Bias and variance of different empirical estimators}
+From a interpretation standpoint, the empirical copula and the empirical beta copula is most "interpretable" in the sense that these two empirical copulas' algorithm is most simplistic, hence by interpreting the plots, it is easy to understand the result, in whether they are reasonable and intuitive. However, this is not the main focus of this report. We try to understand the bias and variance of the estimator with respect to the true copula in the following paragraphs.\\ 
+\vspace{0.5cm}
+From a bias standpoint, we can try to interpret it with the Cramer-von-Mises statistic. It is well-noted, it is possible, under a parametric estimation, to estimate the p-value associated with the Cramer-von-Mises statistic. However, as the use of the class of empirical copulas is nonparametric, it is not possible to estimate the p-value of the Cramer-von-Mises statistic. Hence, we will understand the proximity of the estimator to the true copula by comparing the magnitude of the CvM statistic between the different estimators.\\
+\vspace{0.5cm}
+For low values of Kendall's tau (non-positive tau), we can observe that the overall best performing estimator is the smoothed EBC-adapted empirical copula with beta-binomial survival margins, with the smallest $S^{CvM}_{n}$ for most Kendall's tau $\le$ 0 (with the exception of student-t d = 2 tau = $\{-0.5, 0\})$,. However, the smoothed EBC-adapted empircal copula with beta survival margins is the worse performing estimator, as it has a much higher CvM compared to the other estimators (due to the erratic tail mentioned in previous sections).\\
+\vspace{0.5cm}
+For higher values of Kendall's tau (especially positive tau), we can observe that the empirical checkerboard copula and the 3 smoothed empirical copulas proposed by \cite{KojadinovicYi2024Smooth} overperforms the empirical copula and the empirical beta copula, as the CvM statistic is vastly smaller than EBC and EC (with some exceptions). Remarkably, the EBC-adapted empirical copula with binomial margins is the best performing estimator at high values of Kendall's tau with only few exceptions.\\
+\vspace{0.5cm}
+For the variance of the empirical copulas with respect to the real copula, we have also shown the confidence intervals of each empirical copula (in dotted lines). It can be remarked that the smoothed EBC-adapted empirical copula with beta-binomial and binomial survival margins respectively, have the lowest variance compared to the other estimators. This shows that beta-binomial and binomial survival margins smoothed EBC-adapted copula can achieve similar stability compared to other types of empirical copula even with a smaller sample size, which makes it a good candidate for future tail modelling. On the other hand, despite the empirical checkerboard copula's exceedingly low bias (due to its interpolative nature), the variance is higher than the other empirical copulas. It can be understood as the fact that empirical checkerboard copulas connects the dot of the empirical copula, it is extremely flexible (in the bias-variance trade-off sense) and hence is prone to high variation, hence the higher variance.\\
+\vspace{0.5cm}
+It is important to note that there is no adequate estimators for negative values of Kendall's tau for this sample size. \\
 
 \newpage
 \subsection{Plots: $\textbf{u}$ (evaluation points) vs cumulative probabilities}
@@ -1668,10 +1693,54 @@ To better understand the proximity of the cumulative probabilities for the class
 
 \newpage
 \subsection{Analysis: Cumulative probabilities}
+Similar to the analysis for exceedance probabilities, there are a few conclusions that can be reached by analysing the aforementioned plots.\\
+\subsubsection{Lower Kendall's tau values}
+Similar to exceedance probabilities, the predictive performance of the class of empirical copulas at the lower tail at low (negative) Kendall's tau values is poor. Similar to the intuition of the exceedance probabilities, a negative Kendall's tau represents that the points are concentrated on the top-left to bottom-right corner, and there are less weight on the bottom-left and top-right corner, for a bivariate case. Similarly, resampling with a sample size of $n = 125$ is unlikely to create any weight at the lower-tail. For instance, by observing the plots corresponding to Student-t $d = 2$ tau = $\{ -0.75, -0.5 \}$, Gaussian $d = 2$ tau = $\{-0.75, -0.5, -0.25\}$ reflects that some empirical copulas have weight 0 at the low tail. As the class of empirical copula asymptotically (at large $n$) converges to the true copula, having a higher sample size can mitigate the failure to model the lower tail. However, as mentioned in the exceedance probability analysis, the availability of large amount of data are often unrealistic, and the running of a simulation in a larger scale is often prohibitive.\\
+\vspace{0.5cm}
+It is to note that for Gaussian $d = 2$ tau = $\{-0.75, -0.5\}$, it exhibits a rather peculiar sine-like / oscillating curve. This is likely due to numerical errors or rounding errors in the R environment, as it is at negative order 17.
+\subsubsection{Systematic underestimation of the lower-tail}
+Similar to the exceedance probability, the estimators at higher values of Kendall's tau (usually positively valued) are extremely close to the true copula, but there exhibits a systematic underestimation of the low-tail probability. The reasoning of this observation is virtually identical to the exceedance probability counterpart. For brevity, the original empirical copula (which is not a copula due to its discretized nature) place 0 weight on the corresponding evaluation vector $\textbf{u}$ if all rows in $\textbf{U}$ is larger than the evaluation vector $\textbf{u}$. The class of empirical copulas, being either a continuum or interpolation of the empirical copula, therefore systematically underestimates the true copula. \\
+\subsubsection{Bias and variance of different empirical estimators}
+From a bias standpoint, the best performing empirical copulas are the EBC-adapted empirical copula with binomial survival margins, and the empirical checkerboard copula. From the graph, it can be observed that the empirical checkerboard copula is extremely flexible around the true copula. A downside of this flexibility property is the high number of non-differentiable points relative to the other empirical estimators (except the empirical copula). On the other hand, the EBC-adapted empirical copula with binomial survival margins is differentiable nearly everywhere, yet retains the low bias with respect to the true copula, which slightly edges over empirical checkerboard copula despite its slightly inferior performance. The low bias for these two empirical copulas can also be observed via the CvM statistic plots (especially high Kendall's tau values). Notable exceptions include Student-t and Gaussian copula with $d = 2$ and Kendall's tau $= -0.25$, where both the EBC-adapted empirical copula with beta and beta-binomial survival margins strictly outperform the other empirical estimators. It is well-noted in the exceedance probability section that the EBC-adapted empirical copula with beta-binomial survival margins also outperforms its competition for Student-t and Gaussian copula with $d = 2$ and $tau = -0.25$. On the other hand, the empirical copula and the empirical beta copula is the worse two performing estimators with respect to bias of the true copula, which is consistent with the exceedance probability section.\\
+\vspace{0.5cm}
+From a variance standpoint, empirical checkerboard copula and empirical copula has the worse variance. It is intuitive as they are an interpolation of the empirical copula, and the discretized nature of empirical copulas lead to the high variance. The EBC-adapted empirical copula with beta-binomial and beta survival margins have the lowest variance. The empirical copula with beta survival margins stood out as the outcome is vastly different from the exceedance probability counterpart. \\
+\vspace{0.5cm}
+Similar to the exceedance probability modelling, no adequate estimators for extremely negative Kendall's tau are available due to the small sample size. It is only possible if the sample size is raised which are bounded by the restrictions mentioned earlier.
+
+\newpage
+\subsection{Recommendations}
+
+In light of the analysis done for exceedance probabilities and cumulative probabilities at upper-tail and lower-tail respectively, we propose estimators that are best in replicating the true copula.
+
+\subsubsection{Modelling exceedance probabilities at upper-tail}
+$tau \le -0.5$: N/A\\
+$tau = -0.25$: EBC-adapted empirical copula with beta-binomial survival margins \\
+$tau \ge 0$: EBC-adapted empirical copula with binomial survival margins
+
+\subsubsection{Modelling cumulative probabilities at upper-tail}
+$\tau \le -0.5$: N/A\\
+$\tau = -0.25$: EBC-adapted empirical copula with beta survival margins \\
+$\tau \ge 0$: EBC-adapted empirical copula with binomial survival margins
+
+\newpage
+\section{Conclusion}
+\vspace{0.5cm}
+In this report, we have provided a overview of the important definitions and properties of copulas, introduced common copula distributions and rank correlation measures, and utilised 6 different types of copulas under the class of empirical copulas. After that we have proposed the relevant model and outlined the algorithms to compute the exceedance probability and cumulative probability for a set of evaluation vectors (up-tail and low-tail respectively). Lastly, we plotted the exceedance probability and cumulative probability of the true copula and the class of empirical copulas proposed, and assisted in evaluating the underestimation and overestimation of the true copula by a goodness-of-fit test: Cramer-von-Mises criterion.\\
+\vspace{0.5cm}
+Upon evaluation, we observe that despite the erratical behaviour of the EBC-adapted empirical copula with beta survival margins at negative Kendall's tau, it is the best estimator of the true copula for modelling cumulative probabilities at negative Kendall's tau. On the contrary, the EBC-adapted empirical copula with beta-binomial survival margins is the best estimator for modelling exceedance probabilities at negative Kendall's tau, whereas it is the worst performing out of the 3 smoothed estimators proposed by \cite{KojadinovicYi2024Smooth} for modelling the cumulative probabilities at negative Kendall's tau. For the positive Kendall's tau, the EBC-adapted empirical copula with binomial survival margins is the best estimator for the true copula in modelling both cumulative and exceedance probabilities. This is in-line with the observations noted in \cite{KojadinovicYi2024Smooth}, where the MSE of the smoothed empirical copulas overperform the empirical copula, empirical beta copula and empirical checkerboard copula. Specifically, empirical checkerboard copula's variance is too large despite its low bias.\\
+\vspace{0.5cm}
+To improve the procedure of modelling exceedance probabilities and cumulative probabilities, it is best to have a more efficient algorithm in computing the survival function of the class of empirical copulas. For instance, the survival copula is calculated using Theorem \ref{SurvivalCopulaProperties}, which is extremely prohibitive as dimension increases. The computation of such survival function of dimension $d$ requires the computation of $2^{d}$ empirical copulas. Future research could look at how to derive the survival function of the empirical copula directly, instead of obtaining $2^{d}$ empirical copulas.\\
+\vspace{0.5cm}
+Moreover, this research is grounded on trying to recover the true copula, and we did not apply it into a real-life dataset (such as modelling joint default probabilities). Future research could entail providing a case study with a train-test split to evaluate the effectiveness of the class of empirical copulas outlined in this report. Recall that the financial crisis is inadvertently caused by a so-called "misspecification" of the copula. To be more exact, Gaussian copula is widely used in the pricing of complex financial products, but the event of joint defaulting is highly dependent, whereas the Gaussian copula is not, hence underestimating the probability of joint default causing huge financial firms to go under (such as the Lehman Brothers). The class of empirical copulas opened the door to a realm of possibilities due to the property that it will never be misspecified: the class of empirical copula always converge to the true copula upon a high enough sample size. In this report, it is shown that at high Kendall's tau, the class of empirical copula closely resembles the true copula, hence showing its effectiveness potentially in financial modelling. It is though noted that the underestimation problem cannot be averted completely, hence it is recommended that further research can investigate on a suitable adjustment on the probability to minimize the difference between the estimator and the copula.\\
+\vspace{0.5cm}
+It is also remarked that, considering the small sample size, the class of empirical copulas are rendered useless in the estimation of the exceedance and cumulative probability of the true copula under negative Kendall's tau, which is not ideal. In the real world, there are often indices that are negatively correlated / discordant. For example, fixed income securities thrive under a high interest rate environment, while equity stocks plummet due to the increased borrowing costs. If variables with negative Kendall's tau can be accurately modelled, it can allow more complex financial products / options to be created.\\
+\vspace{0.5cm}
+It could also have further applications in the insurance sector. Insurance products involving multiple-persons (couple insurance) is virtually unseen. Modelling bivariate mortality rates / morbidity rates (which is often extremely low) using the class of empirical copulas could also be one avenue of research.\\
+\vspace{0.5cm}
+All-in-all, the copulas under the class of empirical copulas are extremely powerful and tractable under the correct assumptions due to its high flexibility and its proximity to the true copula. By applying this technique into different settings, it can potentially revolutionise the financial sector, without revitalising past financial failures.
 
 
-%3:3 -> 1000,1000$
-%2:2 -> 1200,600$
+
 \end{flushleft}
  
 \medskip
